@@ -1,0 +1,13 @@
+[project]
+name = "paperpeek"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+dev-dependencies = [
+    "isort>=5.13.2",
+    "ruff>=0.6.8",
+]
