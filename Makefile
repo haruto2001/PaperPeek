@@ -10,6 +10,7 @@ build: ./Dockerfile ./entrypoint.sh
 	docker build . \
 	-t $(IMAGE_NAME) \
 	--build-arg CONTAINER_VERSION=$(CONTAINER_VERSION) \
+	--build-arg USERNAME=$(USERNAME) \
 	--build-arg WORKDIR=$(WORKDIR)
 
 run:
