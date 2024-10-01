@@ -29,7 +29,6 @@ RUN apt-get update && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN . $HOME/.bashrc
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 RUN mkdir ${WORKDIR}
