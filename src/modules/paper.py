@@ -1,11 +1,9 @@
+import logging
 import urllib.parse
 from dataclasses import dataclass
+from typing import Optional
 
 import feedparser
-
-# from utils import get_logger
-
-# logger = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -28,6 +26,7 @@ class ArxivPaperFetcher:
 
     Attributes:
         BASE_URL (str): The base URL of the arXiv API.
+        logger (logging.Logger): Logger instance for logging events.
         cache (dict[str, list[Paper]]): A dictionary to cache query results and reduce redundant API calls.
 
     Methods:
@@ -40,14 +39,18 @@ class ArxivPaperFetcher:
 
     BASE_URL = "http://export.arxiv.org/api/query"
 
-    def __init__(self) -> None:
+    def __init__(self, logger: logging.Logger) -> None:
         """
         Initializes the ArxivPaperFetcher instance with an empty cache.
+
+        Args:
+            logger (logging.Logger): Logger instance for logging events.
         """
+        self.logger = logger
         self.cache = {}
 
     def fetch_papers(
-        self, search_query: str, max_results: int, sort_by: str, sort_order: str
+        self, search_query: str, max_results: int, sort_by: str = "submittedDate", sort_order: str = "descending"
     ) -> list[Paper]:
         """
         Fetches a list of papers from the arXiv API based on the search query and parameters.
@@ -57,8 +60,8 @@ class ArxivPaperFetcher:
         Args:
             search_query (str): The query string to search for in the arXiv papers.
             max_results (int): The maximum number of results to fetch.
-            sort_by (str): The field to sort the results by (e.g., "relevance", "lastUpdatedDate", or "submittedDate").
-            sort_order (str): The order to sort the results in ("ascending" or "descending").
+            sort_by (Optional[str]): The field to sort the results by (e.g., "relevance", "lastUpdatedDate", or "submittedDate").
+            sort_order (Optional[str]): The order to sort the results in ("ascending" or "descending").
 
         Returns:
             list[Paper]: A list of Paper objects containing the title and summary of each fetched paper.
@@ -76,8 +79,12 @@ class ArxivPaperFetcher:
         }
         url = self.BASE_URL + "?" + urllib.parse.urlencode(query_params)
 
+        self.logger.info(f"Fetching papers from URL: {url}")
         feed = feedparser.parse(url)
+        if feed.bozo:
+            self.logger.error(f"Error parsing feed: (stasus={feed.status})")
 
+        breakpoint()
         papers = []
         for entry in feed.entries:
             paper = Paper(title=entry.title, summary=entry.summary)
@@ -95,4 +102,22 @@ class ArxivPaperFetcher:
 
 
 if __name__ == "__main__":
-    fetcher = ArxivPaperFetcher()
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter(
+        "%(asctime)s %(filename)s %(funcName)s():%(lineno)s\n"
+        "[%(levelname)s] %(message)s\n"
+    )
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    fetcher = ArxivPaperFetcher(logger)
+    search_query = "electron"
+    max_results = 10
+    papers = fetcher.fetch_papers(search_query=search_query, max_results=max_results)
+    print(papers)
+
