@@ -15,6 +15,7 @@ build: ./Dockerfile ./entrypoint.sh
 
 run:
 	docker run -it --rm \
+	--env-file ./.env \
 	-e LOCAL_UID=$(shell id -u $(USER)) \
 	-e LOCAL_GID=$(shell id -g $(USER)) \
 	--mount type=bind,src=.,dst=/work \
