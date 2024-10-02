@@ -74,8 +74,8 @@ class ArxivPaperFetcher:
             "search_query": f"all:{search_query}",
             "start": 0,
             "max_results": max_results,
-            # "sortBy": sort_by,
-            # "sortOrder": sort_order,
+            "sortBy": sort_by,
+            "sortOrder": sort_order,
         }
         url = self.BASE_URL + "?" + urllib.parse.urlencode(query_params)
 
