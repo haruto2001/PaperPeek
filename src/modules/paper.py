@@ -1,7 +1,6 @@
 import logging
 import urllib.parse
 from dataclasses import dataclass
-from typing import Optional
 
 import feedparser
 
@@ -50,7 +49,11 @@ class ArxivPaperFetcher:
         self.cache = {}
 
     def fetch_papers(
-        self, search_query: str, max_results: int, sort_by: str = "submittedDate", sort_order: str = "descending"
+        self,
+        search_query: str,
+        max_results: int,
+        sort_by: str = "submittedDate",
+        sort_order: str = "descending",
     ) -> list[Paper]:
         """
         Fetches a list of papers from the arXiv API based on the search query and parameters.
@@ -84,7 +87,6 @@ class ArxivPaperFetcher:
         if feed.bozo:
             self.logger.error(f"Error parsing feed: (stasus={feed.status})")
 
-        breakpoint()
         papers = []
         for entry in feed.entries:
             paper = Paper(title=entry.title, summary=entry.summary)
@@ -120,4 +122,3 @@ if __name__ == "__main__":
     max_results = 10
     papers = fetcher.fetch_papers(search_query=search_query, max_results=max_results)
     print(papers)
-
